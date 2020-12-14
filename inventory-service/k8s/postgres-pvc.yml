@@ -2,9 +2,13 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: nfs-coolstore-postgres-pvc
+  labels:
+    app: inventory-service
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 5Gi
+      storage: 2Gi
+  volumeName: coolstore-postgres-pv0001
+  storageClassName: ""

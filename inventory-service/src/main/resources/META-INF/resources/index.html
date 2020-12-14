@@ -10,7 +10,8 @@
     <link rel="stylesheet" type="text/css"
           href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
 
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.6.1/jquery.timeago.min.js"></script>
     <!-- Load AngularJS -->
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
@@ -69,6 +70,7 @@
         }
 
       });
+
     </script>
 </head>
 <body ng-app="InventoryManagement" ng-controller="InventoryManagementController">
@@ -89,7 +91,8 @@
             <hr>
             <center>
                 <h1>The CoolStore Inventory</h1>
-                <h2>Status: <code style='{{statusStyle}}'>{{statusText}}</code> (Last Successful Fetch: <span>{{fetchAge}}</span>)</h2>
+                <h2>Status: <code style='{{statusStyle}}'>{{statusText}}</code> (Last Successful Fetch: <span>{{fetchAge}}</span>)
+                </h2>
 
             </center>
             <table class="table table-bordered" id="products" border='1'>
