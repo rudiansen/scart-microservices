@@ -39,7 +39,7 @@ public class CatalogService {
 
         JSONArray jsonArray = new JSONArray(inventoryClient.getInventoryStatus(product.getItemId()));
         List<String> quantity = IntStream.range(0, jsonArray.length())
-                .mapToObj(index -> ((JSONObject)jsonArray.get(index))
+                .mapToObj(index -> ((JSONObject) jsonArray.get(index))
                         .optString("quantity")).collect(Collectors.toList());
         product.setQuantity(Integer.parseInt(quantity.get(0)));
         return product;

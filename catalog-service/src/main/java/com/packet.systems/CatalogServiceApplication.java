@@ -8,8 +8,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 public class CatalogServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(CatalogServiceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(CatalogServiceApplication.class, args);
+    }
 
 }
