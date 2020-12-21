@@ -14,6 +14,6 @@ public class CacheService {
     RemoteCacheManager cacheManager;
 
     void onStart(@Observes StartupEvent event) {
-        cacheManager.administration().getOrCreateCache(CART_CACHE, "default");
+        cacheManager.administration().getOrCreateCache(CART_CACHE, "org.infinispan.DIST_SYNC");        
     }
 }

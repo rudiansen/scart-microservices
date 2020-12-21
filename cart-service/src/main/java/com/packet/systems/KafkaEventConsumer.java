@@ -1,6 +1,6 @@
 package com.packet.systems;
 
-import io.smallrye.reactive.messaging.kafka.KafkaMessage;
+import io.smallrye.reactive.messaging.kafka.KafkaRecord;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ public class KafkaEventConsumer {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaEventConsumer.class);
 
     @Incoming("payments")
-    public CompletionStage<Void> onMessage(KafkaMessage<String, String> message) throws IOException {
+    public CompletionStage<Void> onMessage(KafkaRecord<String, String> message) throws IOException {
         LOG.info("Kafka message with value {} arrived", message.getPayload());
         return message.ack();
     }
