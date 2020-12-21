@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreditCard {
 
-    private String name;
     private String number;
+    private String expiration;
     private String nameOnCard;
 
 }
