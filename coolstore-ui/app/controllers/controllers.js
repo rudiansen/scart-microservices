@@ -40,7 +40,7 @@ angular.module('app')
                         }
                     })
                 }, function (err) {
-                    Notifications.error("Error retrieving products: " + err.statusText);
+                    Notifications.error("Error retrieving products: " + data + " | " +err.statusText);
                 });
 
 
