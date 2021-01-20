@@ -5,9 +5,9 @@ angular.module("app")
 .factory('cart', ['$http', '$q', 'COOLSTORE_CONFIG', 'Auth', '$location', function($http, $q, COOLSTORE_CONFIG, $auth, $location) {
 	var factory = {}, cart, products, cartId, baseUrl;
 
- 	//baseUrl = $location.protocol() + '://cart-service-' + COOLSTORE_CONFIG.OCP_NAMESPACE + '.' + $location.host().replace(/^.*?\.(.*)/g,"$1") + '/api/cart';
+ 	baseUrl = $location.protocol() + '://cart-service-' + COOLSTORE_CONFIG.OCP_NAMESPACE + '.' + $location.host().replace(/^.*?\.(.*)/g,"$1") + '/api/cart';
 	// Following used for local testing
- 	baseUrl = $location.protocol() + '://localhost:8383/api/cart';
+ 	//baseUrl = $location.protocol() + '://localhost:8383/api/cart';
 
 
 	factory.checkout_withBilling = function(ccinfo){
