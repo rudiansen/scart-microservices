@@ -1,50 +1,88 @@
-# cart-service project
+Cart Service
+=========
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This is the quarkus version for the coolstore cart service. 
+It uses infinispan, openapi and rest and Kafka extensions
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+To test out:
+http://localhost:8080/swagger-ui
 
-## Running the application in dev mode
 
-You can run your application in dev mode that enables live coding using:
-```shell script
-./mvnw compile quarkus:dev
+To deploy the service to a running single-node OpenShift cluster:
+
+   ```
+$ oc login -u developer -p developer
+
+$ oc new-project MY_PROJECT_NAME
+
+   ```
+
+== Config
+
+   ```
+quarkus.http.port=8080
+quarkus.swagger-ui.always-include=true
+quarkus.smallrye-openapi.path=/swagger
+quarkus.infinispan-client.server-list=localhost:11222
+quarkus.log.console.enable=true
+quarkus.log.console.level=DEBUG
+quarkus.log.level=INFO
+
+mp.messaging.incoming.payments.connector=smallrye-kafka
+mp.messaging.incoming.payments.value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.payments.key.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+mp.messaging.incoming.payments.bootstrap.servers=localhost:9092
+mp.messaging.incoming.payments.group.id=cart-service
+mp.messaging.incoming.payments.auto.offset.reset=earliest
+mp.messaging.incoming.payments.enable.auto.commit=false
+mp.messaging.incoming.payments.request.timeout.ms=30000
+
+mp.messaging.outgoing.orders.bootstrap.servers=localhost:9092
+mp.messaging.outgoing.orders.connector=smallrye-kafka
+mp.messaging.outgoing.orders.topic=orders
+mp.messaging.outgoing.orders.value.serializer=org.apache.kafka.common.serialization.StringSerializer
+mp.messaging.outgoing.orders.key.serializer=org.apache.kafka.common.serialization.StringSerializer
+
+   ```
+  
+== Running locally:
+   ```
+# Make sure Kafka is running e.g 
+bin/zookeeper-server-start.sh config/zookeeper.properties
+bin/kafka-server-start.sh config/server.properties
+
+# Creating the topic
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic orders
+
+# Listening to the topic on the console
+bin/kafka-console-consumer.sh --topic orders --from-begining
+
+# Run infinispan for cache of the cart
+docker run -it -p 11222:11222 jboss/infinispan-server:10.0.0.Beta3
+
+   ```
+
+
+
+
+
+== Running on Openshift:
+Finally run the following
+
 ```
+oc new-app jboss/infinispan-server:10.0.0.Beta3 --name=datagrid-service
 
-## Packaging and running the application
+# You might want to add a configmap or change the application.properties for running it in openshift with your config e.g. kafka cluster host.
 
-The application can be packaged using:
-```shell script
-./mvnw package
-```
-It produces the `cart-service-1.0.0-SNAPSHOT-runner.jar` file in the `/target` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/lib` directory.
-
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
-```
-
-The application is now runnable using `java -jar target/cart-service-1.0.0-SNAPSHOT-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using: 
-```shell script
 ./mvnw package -Pnative
-```
+./mvnw package -Pnative -Dnative-image.docker-build=true
+docker build -f src/main/docker/Dockerfile.native -t cart-service .
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
-```
+oc new-build --binary --name=cart-service -l app=cart-service
+oc patch bc/cart-service -p '{"spec":{"strategy":{"dockerStrategy":{"dockerfilePath":"src/main/docker/Dockerfile.native"}}}}'
+oc start-build cart-service --from-dir=. --follow
+oc new-app --image-stream=cart-service:latest
+oc expose svc/cart-service
 
-You can then execute your native executable with: `./target/cart-service-1.0.0-SNAPSHOT-runner`
+ ```
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
-
-# RESTEasy JAX-RS
-
-<p>A Hello World RESTEasy resource</p>
-
-Guide: https://quarkus.io/guides/rest-json

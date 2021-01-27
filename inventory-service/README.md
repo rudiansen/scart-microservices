@@ -1,50 +1,111 @@
-# inventory-service project
+# Quarkus demo: Hibernate ORM with Panache and RESTEasy
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+This is a minimal CRUD service exposing a couple of endpoints over REST,
+with a front-end based on Angular so you can play with it from your browser.
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+While the code is surprisingly simple, under the hood this is using:
+ - RESTEasy to expose the REST endpoints
+ - Hibernate ORM with Panache to perform the CRUD operations on the database
+ - A PostgreSQL database; see below to run one via Docker
+ - ArC, the CDI inspired dependency injection tool with zero overhead
+ - The high performance Agroal connection pool
+ - Infinispan based caching
+ - All safely coordinated by the Narayana Transaction Manager
 
-## Running the application in dev mode
+## Requirements
 
-You can run your application in dev mode that enables live coding using:
-```shell script
-./mvnw compile quarkus:dev
-```
+To compile and run this demo you will need:
+- GraalVM `1.0 rc12`
+- Apache Maven `3.5.3+`
 
-## Packaging and running the application
+In addition, you will need either a PostgreSQL database, or Docker to run one.
 
-The application can be packaged using:
-```shell script
-./mvnw package
-```
-It produces the `inventory-service-1.0.0-SNAPSHOT-runner.jar` file in the `/target` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/lib` directory.
+If you don't have GraalVM installed, you can download it here:
 
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
-```
+<https://github.com/oracle/graal/releases>
 
-The application is now runnable using `java -jar target/inventory-service-1.0.0-SNAPSHOT-runner.jar`.
+Installing GraalVM is very similar to installing any other JDK:
+just unpack it, add it to your path, and point the `JAVA_HOME`
+and `GRAALVM_HOME` environment variables to it.
 
-## Creating a native executable
+You should then use this JDK to run the Maven build.
 
-You can create a native executable using: 
-```shell script
-./mvnw package -Pnative
-```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./mvnw package -Pnative -Dquarkus.native.container-build=true
-```
+## Building the demo
 
-You can then execute your native executable with: `./target/inventory-service-1.0.0-SNAPSHOT-runner`
+After having set GraalVM as your JVM, launch the Maven build on
+the checked out sources of this demo:
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
+> mvn package
 
-# RESTEasy JAX-RS
+## Running the demo
 
-<p>A Hello World RESTEasy resource</p>
+### Prepare a PostgreSQL instance
 
-Guide: https://quarkus.io/guides/rest-json
+First we will need a PostgreSQL database; you can launch one easily if you have Docker installed:
+
+> docker run --ulimit memlock=-1:-1 -it --rm=true --memory-swappiness=0 --name quarkus_test -e POSTGRES_USER=quarkus_test -e POSTGRES_PASSWORD=quarkus_test -e POSTGRES_DB=quarkus_test -p 5432:5432 postgres:10.5
+
+Alternatively you can setup a PostgreSQL instance in any another way.
+
+The connection properties of the Agroal datasource are configured in the standard Quarkus configuration file, which you will find in
+`src/main/resources/application.properties`.
+
+### Run Quarkus in developer mode
+
+To run the application in interactive mode (developer mode):
+
+>  mvn compile quarkus:dev
+
+In this mode you can make changes to the code and have the changes immediately applied, by just refreshing your browser.
+
+    Hot reload works even when modifying your JPA entities.
+    Try it! Even the database schema will be updated on the fly.
+
+### Run Quarkus in JVM mode
+
+When you're done playing with "dev-mode" you can run it as a standard Java application.
+
+First compile it:
+
+> mvn package
+
+Then run it:
+
+> java -jar ./target/hibernate-orm-panache-resteasy-1.0-SNAPSHOT-runner.jar
+
+    Have a look at how fast it boots.
+    Or measure total native memory consumption...
+
+### Run Quarkus as a native application
+
+This same demo can be compiled into native code: no modifications required.
+
+This implies that you no longer need to install a JVM on your production environment, as the runtime technology is included in the produced binary, and optimized to run with minimal resource overhead.
+
+Compilation will take a bit longer, so this step is disabled by default;
+let's build again by enabling the `native` profile:
+
+> mvn package -Dnative
+
+After getting a cup of coffee, you'll be able to run this binary directly:
+
+> ./target/hibernate-orm-panache-resteasy-1.0-SNAPSHOT-runner
+
+    Please brace yourself: don't choke on that fresh cup of coffee you just got.
+    
+    Now observe the time it took to boot, and remember: that time was mostly spent to generate the tables in your database and import the initial data.
+    
+    Next, maybe you're ready to measure how much memory this service is consuming.
+
+N.B. This implies all dependencies have been compiled to native;
+that's a whole lot of stuff: from the bytecode enhancements that Panache
+applies to your entities, to the lower level essential components such as the PostgreSQL JDBC driver, the Undertow webserver.
+
+## See the demo in your browser
+
+Navigate to:
+
+<http://localhost:8080/index.html>
+
+Have fun, and join the team of contributors!
